@@ -11,7 +11,7 @@ readStream.on("data",function (chunk){
 
 readStream.on("end",function (err){
    if(err) 
-       console.log(err);
+       return console.log(err);
     console.log("Lectura Finalizada");
     writeStream.end(); // close the writeable stream to finalize the writing
 });
@@ -26,3 +26,21 @@ writeStream.on('error', function (err) {
 });
 //readStream.pipe(writeStream);
 // however, to show how streams work, we have done things the long way.
+
+// req.pipe(write) //on.data -> stream.pipe(destination, [options]) ,init,end
+-->// res.pipe(read)  //.write
+// read.pipe(res)  //on.data
+
+
+/*Connects this read stream to destination WriteStream. Incoming data on this stream gets written to destination. The destination and source streams are kept in sync by pausing and resuming as necessary.
+
+Emulating the Unix cat command:
+
+process.stdin.resume();
+process.stdin.pipe(process.stdout);
+
+YOTENGODATOS.pipe(destino)
+
+https://nodejs.org/docs/v0.4.10/api/streams.html#streams
+https://docs.nodejitsu.com/articles/advanced/streams/how-to-use-stream-pipe
+*/
