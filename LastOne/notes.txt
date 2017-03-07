@@ -1,0 +1,80 @@
+All the different types of streams use .pipe() to pair inputs with outputs.
+
+.pipe() is just a function that takes a readable source stream src and hooks the output to a destination writable stream dst:
+
+  src.pipe(dst)
+.pipe(dst) returns dst so that you can chain together multiple .pipe() calls together:
+  a.pipe(b).pipe(c).pipe(d)
+  
+This is very much like what you might do on the command-line to pipe programs together:
+
+  a | b | c | d
+except in node instead of the shell!
+//-------
+consuming a readable stream
+
+Most of the time it's much easier to just pipe a readable stream into another kind of stream or a stream created with a module like through or concat-stream, but occasionally it might be useful to consume a readable stream directly.
+
+  process.stdin.on('readable', function () {
+      var buf = process.stdin.read();
+      console.dir(buf);
+  });
+  
+You can also tell .read(n) to return n bytes of data. Reading a number of bytes is merely advisory and does not work for object streams, but all of the core streams support it.
+
+Here's an example of using .read(n) to buffer stdin into 3-byte chunks:
+
+  process.stdin.on('readable', function () {
+      var buf = process.stdin.read(3);
+      console.dir(buf);
+  });
+  
+You can also use .unshift() to put back data so that the same read logic will fire when .read() gives you more data than you wanted.
+
+Using .unshift() prevents us from making unnecessary buffer copies. Here we can build a readable parser to split on newlines:
+// https://www.npmjs.com/package/split
+
+------- Writing stream
+
+A writable stream is a stream you can .pipe() to but not from:
+
+src.pipe(writableStream)
+
+----
+The first argument, chunk is the data that is written by the producer.
+
+The second argument enc is a string with the string encoding, but only when opts.decodeString is false and you've been written a string.
+
+The third argument, next(err) is the callback that tells the consumer that they can write more data. You can optionally pass an error object err, which emits an 'error' event on the stream instance.
+
+If the readable stream you're piping from writes strings, they will be converted into Buffers unless you create your writable stream with Writable({ decodeStrings: false }).
+
+If the readable stream you're piping from writes objects, create your writable stream with Writable({ objectMode: true }).
+
+writing to a writable stream
+
+To write to a writable stream, just call .write(data) with the data you want to write!
+
+process.stdout.write('beep boop\n');
+To tell the destination writable stream that you're done writing, just call .end(). You can also give .end(data) some data to write before ending:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
